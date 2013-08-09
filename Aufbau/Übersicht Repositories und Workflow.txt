@@ -1,0 +1,37 @@
+#################################################################
+# neue Idee für Repositories
+#################################################################
+
+Legende:
+	"Name": Server (keine Einrückung, beliebiger Eext in Anführungszeichen)
+	Name: Repository (Einrückungstiefe 1, CamelCase Text)
+	name: Branch (Einrückungstiefe 2, kleingeschriebener Text)
+
+"Github"
+	ProjectName				====> bare production repository
+		*master				==> Ablage des Codes, der gerade produktiv deployt ist
+
+"CI-Server"
+	Beta					====> bare testing repository
+		*master				==> Ablage des Codes, der als nächstes produktiv sein wird
+								dieser Code hat alle Tests bestanden, ist aber noch nicht deployt
+		acceptancetests		==> Systemtests ok, Akzeptanztests stehen aus
+		systemtests			==> Integrationstests ok, Systemtests stehen aus
+		integrationtests	==> Unittests ok, Integrationstests stehen aus
+		unittests			==> Build ok, Unittests stehen aus
+
+	Omega					====> Arbeitsrepository des CI-Servers
+		*master				==> Arbeitskopie zu Erstellung der Anwendungsversionen, die für die
+							    verschiedenen Teststufen gebraucht werden
+
+	Alpha					====> bare repository für Entwickler
+		*master				==> Hauptentwicklungsbranch
+							    Entwickler können sich hier beliebige weitere Branches anlegen
+
+"Developer Machine"
+	Alpha					====> Arbeitsrepository des Entwicklers
+		*master				==> Hauptentwicklungsbranch
+							    ansonsten kann der Entwickler hier machen was er will
+
+#################################################################
+
