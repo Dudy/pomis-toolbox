@@ -1,0 +1,28 @@
+Online Requirement Tool
+
+- Google App Engine Anwendung: pomis-toolbox
+- ich entwickle mit NetBeans, kann aber jeder machen wie er will
+- Github Repository: https://github.com/Dudy/pomis-toolbox.git
+- das Github Repository ist auf CI Server geklont
+- Entwickler klonen ihr lokales Repository vom CI Server
+- es gibt drei Hauptbranches
+	- master
+	- staging
+	- development
+	- es wird nur auf dem development Branch gearbeitet
+	- TODO: die master und staging Branches sollen per Git Hook
+	  nur lesbar gemacht werden, hab ich aber noch nicht drauf
+- Projekt wird in Agilo getrackt
+- Ticket #1 beschreibt den Aufbau der Umgebung
+	- Google App Engine herunterladen und installieren
+	- Git installieren
+	- Erstellen eines Github Repositories
+		- Checkin einer initialen Version
+			- URL Handler
+			- Project Namespace ("/toolbox")
+			- Development Namespace ("/toolbox/development")
+			- Staging Namespace ("/toolbox/staging")
+			- Production Namespace ("/toolbox/")
+			- leere Seite für jeden Namespace
+	- Erstellen einer GAE Anwendung
+		- Upload der initialen Version

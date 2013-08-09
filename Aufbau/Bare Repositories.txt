@@ -1,0 +1,6 @@
+Es könnte sein, daß die Repositories auf dem CI-Server entweder
+- eine working copy brauchen oder
+- bare sein müssen
+
+Man kann ich Repository nachträglich als bare definieren: git config --bool core.bare true
+Weiß nicht den genauen Zusammenhang, aber als bare Repository hat's geklappt.
