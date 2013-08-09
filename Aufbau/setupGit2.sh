@@ -138,16 +138,12 @@ echo "### create local branches staging/development and push to Github"
 cd beta
 # create new staging branch
 git checkout -b staging
-# push new branch to Github
-#git push -u origin staging
 echo "### staging branch created"
 
 # need to switch back to master branch to derive new branch from
 git checkout master
 # create new development branch
 git checkout -b development
-# push new branch to Github
-#git push -u origin development
 echo "### development branch created"
 
 # initialization of beta finished, now make it a bare "server" repository
@@ -310,6 +306,7 @@ $ touch proj.git/git-daemon-export-ok
  
  
  curl -i -u username -d '{"scopes":["public_repo"]}' https://api.github.com/authorizations
+ 
  
  
  
