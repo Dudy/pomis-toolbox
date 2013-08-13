@@ -82,10 +82,10 @@ cd $rootdir
 # the same way that the productive workflow later on is meant to be
 
 # work flow step 1 (developer)
-#     clone server alpha repository to local alpha repository
+#     clone server development repository to local development repository
 #     add some files in working directory
 #     add new files in git
-#     commit and push changes back to server alpha repository
+#     commit and push changes back to server development repository
 
 # work takes place in a temporary directory
 temp_dir=/tmp/initGit_$timestamp
@@ -95,19 +95,19 @@ cd $temp_dir
 # use templates
 template_dir=`dirname $0`/templates
 
-# clone alpha repository
-git clone $rootdir/alpha temp_alpha
+# clone development repository
+git clone $rootdir/development temp_development
 
-# add files to alpha repository
+# add files to development repository
 for f in *.sh
 do
-    echo "### copy $template_dir/$f to $temp_dir/temp_alpha/$f"
-    cp $template_dir/$f $temp_dir/temp_alpha/$f
-    chmod 777 $temp_dir/temp_alpha/$f
+    echo "### copy $template_dir/$f to $temp_dir/temp_development/$f"
+    cp $template_dir/$f $temp_dir/temp_development/$f
+    chmod 777 $temp_dir/temp_development/$f
 done
 
 # add to repository
-cd $temp_dir/temp_alpha
+cd $temp_dir/temp_development
 git add .
 git commit -m 'added test scripts'
 git push origin master
@@ -115,16 +115,16 @@ git push origin master
 # the following steps are all done by and on the CI-Server, no further
 # action required here (I just mention it here for clarity)
 # work flow step 2 (CI-Server)
-#     git hook on alpha:master detecs change
+#     git hook on development:master detects change
 #     merge changes to omega:master
 #     try to build the application
-#     if unsuccessful revert changes on omega and alpha repository,
+#     if unsuccessful revert changes on omega and development repository,
 #         send mail to developer and exit
 #     if successful push changes to beta:unittests
 # work flow step 3 (CI-Server)
-#     git hook on beta:unittests detecs change
+#     git hook on beta:unittests detects change
 #     run unit tests
-#     if unsuccessful revert changes on omega and alpha repository,
+#     if unsuccessful revert changes on omega and development repository,
 #         send mail to developer and exit
 #     if successful push changes to beta:unittests
 
