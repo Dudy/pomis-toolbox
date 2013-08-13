@@ -1,39 +1,63 @@
-Es wird ein strikter continuous integration Ansatz verfolgt. Diagramme sind unten auf der Seite zu sehen.
+Es wird ein strikter continuous integration Ansatz verfolgt. Im ersten Diagramm sieht man eine Übersicht über verschiedene Systeme (externer Server, CI-Server, Entwickler) und Repositories (main, test, dev). Im zweiten Diagramm ist der Datenfluß von Änderungen vom Entwicklerrechner bis zur Produktion dargestellt. Der Text weiter unten beschreibt den Aufbau genauer.
 
-### Aufbau
+![Repository Aufbau](https://dl.dropboxusercontent.com/s/hvxn4o1krpid1hb/GitInfrastruktur4a.svg?token_hash=AAGWTwWVdEthR6fRiYb8WJLlGvJRa0NUA4V1HTVZXnBcsg&dl=1)
+
+![Datenfluß](https://dl.dropboxusercontent.com/s/tkbugc7ywhrw96a/GitInfrastruktur4b.svg?token_hash=AAGJHgOS80sdeWLNmaO0LMkBPYGL8CqxZU6a1P9uCUGpWQ&dl=1)
+
+## Aufbau
+
 Ich gehe aus von einem neuen Projekt "MyProject", für das ich ein (Haupt-)Repository mit einem Master Branch auf einem externen Server (hier: Github) habe. Der produktive Sourcecode, also der, der gerade online ist, ist dort hinterlegt, aber mehr als Backup denn als Versionierungsserver, das macht mein CI-Server.
+
 Ich habe außerdem einen lokalen continuous integration Server (CI-Server, mit Jenkins, komplettes System liegt als Kubuntu VMWare Image vor). Dort klone ich das Hauptrepository und nenne es Test. Das Test Repository ist "bare", hat also keine working copy des Projekts.
+
 Das Test Repository klone ich direkt noch mal lokal und nenne es Development Repository. In diesem Development Repository entferne ich aber sofort die remote Verbindung zum Test Repository, so daß es zu diesem Zeitpunkt lediglich eine Kopie ist. Auch das Development Repository ist "bare". Auf diesem Repository werden die Entwickler später arbeiten. Im Test Repository lege ich danach noch vier zusätzliche Branches an: Acceptancetests, Systemtests, Integrationtests und Unittests.
+
 Dann klone ich das komplette Test Repository noch fünf mal, und zwar mit den Namen Acceptancetests, Systemtests, Integrationtests, Unittests und Buildtests. Diese sind nicht "bare", denn hier werden die Projektstände verwendet, um die korrespondierenden Tests laufen zu lassen.
+
 Im letzten, dem Buildtests Repository, wird das Development Repository als zusätzliches remote Repository unter dem Namen "development" hinzugefügt.
 
-### Vorgehen Entwicklung
+## Vorgehen Entwicklung
+
 Ein Entwickler klont sich vom CI-Server das Development Repository. Auf seinem lokalen Development Repository legt er dann pro Feature/Bugfix/Ticket/Task/User Story/... einen Branch an.
+
 Die Branches auf dem Development Repository kann und soll der Entwickler mit dem Development Repository des CI-Servers synchronisieren. In den Master Branch desselben sollen aber nur (aus Sicht des Entwicklers) fertige Feature Branches hineingemergt werden.
+
 Wenn dies passiert, also wenn sich der Master Branch des Development Repositories auf dem CI-Server verändert, beginnt dort der automatische Testablauf.
 
-### Vorgehen automatischer Testablauf
+## Vorgehen automatischer Testablauf
 
-## Buildtests
+### Buildtests
+
 Das Development Repository auf dem CI-Server ist mit einem git-hook versehen, der ausgelöst wird, wenn sich am Master Branch etwas ändert und der zunächst den Master Branch für Pushes sperrt und dann den Jenkins Job "MyProject_00_buildTest" triggert.
+
 Dieser Job verwendet das Buildtests Repository und mergt die Änderungen aus dem Development Repository dort hinein. In dieser working copy wird dann das Skript buildTest.sh ausgeführt. Treten dabei Fehler auf, so wird das letzte Changeset wieder zurückgenommen, und zwar im Buildtests und im Development Repository. Der Entwickler, der die Änderung eingecheckt hatte, bekommt eine Mail mit der Fehlerbeschreibung. Dann wird der Master Branch des Development Repositories (im vorherigen Stand) wieder zum Pushen freigegeben.
+
 Läuft der Buildtest erfolgreich, dann bekommt er Entwickler eine Erfolgsmeldung per Mail und der Master Branch des Development Repositories wird wieder entsperrt. Außerdem wird hier nun eine Build-Nummer vergeben. Dann werden die Änderungen in den Unittest Branch des Test Repositories gepusht.
 
-## Unittests
+### Unittests
+
 Im Test Repository gibt es mehrere git hooks, einen für jeden Branch. Diese funktionieren analog zu den Buildtests.
+
 Wenn im Unittest Branch des Test Repositories eine Änderung detektiert wird, dann wird zunächst der Branch für weitere Pushes gesperrt und anschließend der korrespondierende Jenkins Job getriggert (hier: "MyProject_01_unitTest", der Name setzt sich immer zusammen aus dem Projektnamen, einer laufenden Nummer (Reihenfolge der Teststufen) und dem Namen der Teststufe). Schließlich wird das Skript unitTest.sh gestartet.
+
 Wenn das Skript einen Fehler liefert, kann die Änderung aber nicht mehr rückgängig gemacht werden. Statt dessen wird die Version als "BAD" getaggt und alle Entwickler bekommen eine Mail mit der Zusammenfassung der Tests.
+
 Wenn die Unittests fehlerfrei durchlaufen, dann gibt es keine weitere Benachrichtigung (neben der Übersicht im Jenkins Dashboard). Die Version wird im Unittests Repository mit der Buildnummer getaggt, und die Änderungen werden in den Integrationstests Branch des Test Repositories gepusht.
+
 Zum Schluß wird in jedem Fall der Branch wieder für Pushes entsperrt.
 
-## Integrationstests, Systemtests, Acceptancetests
+### Integrationstests, Systemtests, Acceptancetests
+
 Die drei nächsten Teststufen laufen exakt analog zu den Unittests. Es gibt immer einen git hook, der den Branch sperrt, einen Jenkins Job triggert, Tests ausführt und den Branch wieder entsperrt sowie gegebenenfalls die Änderungen in die neue Teststufe pusht oder allen Entwicklern eine Mail schickt.
 
 ### erfolgreicher Abschluß
+
 Wenn die letzte Teststufe, die Akzeptanztests, erfolgreich durchlaufen wurde, wird die Version als "ready for production" angesehen. Der letzte Push überführt dann das Projekt in den Master Branch des Test Repositories. Dieser Stand kann nun deployt und in Produktion genommen werden.
+
 Die Inbetriebnahme selbst ist hier nicht näher erläutert. Als Teil der Inbetriebnahme soll aber das Projekt aus dem Master Branch des Test Repositories auf den Server (hier: Github) gepusht werden, damit dort immer der Stand der Produktion vorhanden ist.
 
-### Anmerkungen
+## Anmerkungen
+
 - Niemand arbeitet direkt mit dem Hauptrepository auf dem externen Server (hier: Github).
 - Niemand arbeitet direkt mit dem Test Repository auf dem CI-Server.
 - Alle arbeiten mit dem Development Repository; deswegen ist es bewußt einfach gehalten (nur ein Master Branch).
@@ -63,7 +87,3 @@ Die Inbetriebnahme selbst ist hier nicht näher erläutert. Als Teil der Inbetrieb
     - Es sollen eigentlich nur fertige Features/Bugfixes in Development:Master landen. Wurden zu kleine Änderungen eingebaut?
     - Die Fertigstellung eines Features/Bugfixes dauert im Schnitt weniger lange als ein Durchlauf aller Unittests. Ein Unittestlauf sollte aber höchstens eine Stunde dauern. Entweder dauert der Unittestlauf zu lange oder die Featuresets sind zu klein geschnitten.
     - Sind im Unittestlauf wirklich nur Unittests drin? Oder sind auch Integrationstests reingelaufen, die viel länger dauern? Werden Drittsysteme (Datenbank, Suchmaschinen, andere Services) verwendet, die man mocken kann?
-
-![Repository Aufbau](https://dl.dropboxusercontent.com/s/hvxn4o1krpid1hb/GitInfrastruktur4a.svg?token_hash=AAGWTwWVdEthR6fRiYb8WJLlGvJRa0NUA4V1HTVZXnBcsg&dl=1)
-
-![Datenfluß](https://dl.dropboxusercontent.com/s/tkbugc7ywhrw96a/GitInfrastruktur4b.svg?token_hash=AAGJHgOS80sdeWLNmaO0LMkBPYGL8CqxZU6a1P9uCUGpWQ&dl=1)
