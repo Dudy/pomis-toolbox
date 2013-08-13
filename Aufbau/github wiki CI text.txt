@@ -1,0 +1,121 @@
+Es wird ein strikter continuous integration Ansatz verfolgt.
+
+![Git Infrastruktur](https://photos-6.dropbox.com/t/0/AADTiH2fU7gWqMh2ICx3_bQG6XIDoNDmsYkYvurizdQbEA/12/23973014/png/1024x768/3/1375984800/0/2/GitInfrastruktur.png/Tnqgl3uD-BLneG8JwCbn0AZ5pQSXC5Y4HnM2hhL2EZo)
+
+### Vorgehen Aufbau
+Der produktive Sourcecode ist auf Github gehostet, aber mehr als Backup denn als Versionierungsserver, das macht mein CI-Server.
+Ich gehe aus von einem neuen Projekt "MyProject", für das ich ein (Haupt-)Repository mit einem master Branch auf dem Server (Github) habe.
+Ich habe außerdem einen continuous integration Server (CI-Server, mit Jenkins, komplettes System liegt als Kubuntu VMWare Image vor). Dort klone ich das Hauptrepository und nenne es Beta.
+Das Beta Repository klone ich direkt noch mal lokal und nenne es Alpha Repository. In diesem Alpha Repository entferne ich aber sofort die remote Verbindung zum Beta Repository, so daß es zu diesem Zeitpunkt lediglich eine Kopie ist.
+Im Beta Repository lege ich danach noch vier zusätzliche Branches an: "acceptancetests", "systemtests", "integrationtests" und "unittests". auf diesen werden die gleichnamigen automatischen Tests ablaufen.
+Schließlich klone ich das Alpha Repository nochmals in ein Omega Repository; die remote Verbindung im Omega Repository benenne ich dann auch von origin in alpha um. Außerdem registriere ich das Betarepository unter dem Namen beta als weiteres remote Repository von Omega.
+
+### Vorgehen Entwicklung
+Ein Entwickler klont sich vom CI-Server das Alpha Repository. Auf seinem lokalen Alpha legt er dann pro Feature/Bugfix/Ticket/Task/User Story/... einen Branch an.
+Die Branches auf dem Alpha Repository kann und soll der Entwickler mit dem Alpha Repository des CI-Servers synchronisieren. In den master Branch desselben sollen aber nur (aus Sicht des Entwicklers) fertige Feature Branches hineingemergt werden.
+Wenn dies passiert, also wenn sich der master Branch des Alpha Repositories auf dem CI-Server verändert, beginnt dort der automatische Testablauf.
+
+### Vorgehen automatischer Testablauf
+Das Alpha Repository auf dem CI-Server ist mit einem git-hook versehen, der einen Jenkins Lauf triggert.
+
+TODO
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### Einschränkungen (oder auch: der Prozess)
+- Niemand arbeitet direkt mit dem Hauptrepository.
+- Niemand arbeitet direkt mit dem Beta Repository.
+- Alle arbeiten mit dem Alpha Repository; deswegen ist es bewußt einfach gehalten (nur ein master Branch).
+- Jeder Entwickler muß dafür sorgen, daß er immer alle neuen Änderungen vom Alpha Repository auf dem CI-Server pullt BEVOR er seine Änderung dorthin pusht. Ja, das ist merge Arbeit, aber 1. fällt die immer an und 2. kann das niemand besser als der Entwickler.
+- Der Alpha Branch auf dem CI-Server muß immer kompilieren können.
+- Wenn mehrere Entwickler an einem Feature arbeiten (z.B. Subsystem und Activity), dann können sie ruhig untereinander ihre Repositories synchronisieren, solange sie entwickeln. Erst wenn sie fertig sind wird einer dann seinen feature Branch in seinen master mergen und das zum CI-Server pushen.
+- Nach jeder Änderung auf dem master Branch des Alpha Repositories auf dem CI-Server wird Jenkins versuchen zu bauen und zu deployen.
+  - Klappt das nicht, wird die letzte Änderung automatisch rückgängig gemacht und der Entwickler bekommt eine Mail.
+  - Klappt das, wird (wieder durch Jenkins getriggert) die Änderung von Alpha:master nach Beta:development gepusht. Hier ist kein vorheriger Pull notwendig, denn auf dem Beta Repository arbeitet niemand.
+- Nach jeder Änderung auf Beta:development (nur durch Jenkins-getriggerten Pull von Alpha:master aus!) wird gebaut, deployt und alle Unittests ausgeführt.
+  - Quasi permanenter NightBuild (Unittestlauf)
+  - Bei Performanceproblemen: siehe Anmerkung unten zum Thema "Trennung der Teststufen - FIRST" und "Hilfe, es kommen zu viele Änderungen rein!"
+  - Wenn der Unittestlauf erfolgreich war, mergt Jenkins den Beta:development Branch in den Beta:staging Branch.
+- Nach jeder Änderung auf Beta:staging laufen alle Integrationstests.
+  - Vermutlich weniger häufig als Unittestläufe, da dort häufiger Fehler auftauchen.
+  - Vermutlich ähnliche Laufzeit, es gibt insgesamt weniger Tests, dafür dauern sie im einzelnen länger, weil Drittsysteme involviert sind (weniger oder keine Mockups mehr).
+  - Wenn der Lauf erfolgreich war, mergt Jenkins den Beta:staging Branch in den Beta:master Branch.
+- Nach jeder Änderung auf Beta:master laufen alle Systemtests.
+  - Wenn diese erfolgreich waren ist aus Sicht der Softwareentwicklung die Anwendung (bzw. dieses Release) fertig.
+  - Bei Erfolg pusht Jenkins den master Branch ins Hauptrepository.
+- Der Stand im master Branch des Hauptrepositories wird gebaut und in einer produktionsnahen Testumgebung deployt. Hier finden Akzeptanztests statt.
+  - Treten Dinge auf, die dem Anwender nicht gefallen, muß er sich mit dem Team in Verbindung setzen.
+  - Ansonsten wird dieser Stand in Produktion genommen.
+
+### Anmerkungen
+-  Es ist notwendig, die Trennung der Teststufen einzuhalten (auch wenn im Scrumteam "Analyst", "Entwickler" und "Tester" vielleicht dieselbe Person ist oder sogar immer alle):
+  - Komponententests: vom Entwickler erzeugte Unittests, die nur die Komponente testen, Definition: als Sourcecode, Scope: Methode oder Klasse, Ausführung: automatisch
+    - Anmerkung: mache Unittests FIRST
+      - Fast: Tests müssen schnell laufen
+      - Independent: alle Tests müssen unabhängig voneinander sein, damit sie in beliebiger Reihenfolge und auch verteilt ausgeführt werden können
+      - Repeatable: wiederholte Testläufe müssen immer das gleiche Ergebnis liefern
+      - Self-Checking: niemand muß Testergebnisse kontrollieren, wenn was schief läuft, meldet sich das Testsystem beim Benutzer
+      - Timely: Tests werden gleichzeitig mit Code, idealerweise sogar vorher entwickelt
+    - Integrationstests: vom Tester erzeugte Tests, die testen, ob das Design korrekt umgesetzt ist, Definition: im Ticket/Task, Scope: ein oder ein paar wenige Systeme/Projekte, Ausführung: automatisch
+    - Systemtest: vom Analysten erzeugte Tests, die das gewünschte Verhalten testen, Definition: in User Story, Scope: Gesamtsystem (alle Teilprojekte), Ausführung: automatisch
+    - Akzeptanztest: vom Anwender durchgeführte Tests in produktionsähnlicher Umgebung, Ausführung: teils automatisch, teils manuell, letztlich Anwender überlassen
+- Eine ausgewiesene "Regression" gibt es nicht, alles läuft ohnehin ständig.
+- Spezielle Tests etwa zur Performance, Fuzzytesting, Security Audits und ähnliches sind hier nicht behandelt.
+- Ich habe keine Angst vor Mockups, zumindest nicht bei Komponententests. Wenn ich eine Methode testen will, brauche ich keine Datenbank und auch keine anderen Drittsysteme.
+- Hilfe, es kommen zu viele Änderungen rein!
+  - Wenn viele Entwickler an vielen Features arbeiten, kann es sein, daß Beta:development bereits das nächste Update bekommt, bevor der letzte Unittestlauf fertig ist.
+  - Der nächste Unittestlauf wird dann einfach sofort dann gestartet, wenn der letzte durch ist.
+  - Wenn so häufig Änderungen an Beta:development gemacht werden, daß der permanente NightBuild nicht hinterher kommt, was ist dann passiert?
+    - Es sollen eigentlich nur fertige Features/Bugfixes in Beta:development landen. Wurden zu kleine Änderungen eingebaut?
+    - Die Fertigstellung eines Features/Bugfixes dauert im Schnitt weniger lange als ein Durchlauf aller Unittests. Ein Unittestlauf sollte aber höchstens eine Stunde dauern. Entweder dauert der Unittestlauf zu lange oder die Featuresets sind zu klein geschnitten.
+    - Sind im Unittestlauf wirklich nur Unittests drin? Oder sind auch Integrationstests reingelaufen, die viel länger dauern? Werden Drittsysteme (Datenbank, Suchmaschinen, andere Services) verwendet, die man mocken kann?
+- Der master Branch auf dem Hauptrepository beinhaltet den Stand der Anwendung, der beim nächsten Deployment live gehen wird (dann gibt's auch ein Tag drauf).
+- Wenn der CI-Server irgendwas von Alpha:master nach Beta:development pushen will, muß er den Namen berücksichtigen.
+```bash
+	# auf beta ist für den CI-Server immer nur der master branch interessant
+	git checkout master
+	# pushes müssen berücksichtigen, daß vom lokalen master in den remote development branch gepusht wird
+	git push beta master:development
+```
+
+### Offene Punkte
+- Was passiert, wenn Unittests grün laufen, aber bei Systemtests ein Fehler auftritt. Soll dann alles zurückgerollt werden?
+- Mit einem continuous delivery Ansatz (daran arbeite ich noch) fallen Akzeptanztests weg. Schließlich programmiere ich für mich, nicht im Auftrag anderer.
+- Für den Aufbau dieser Infrastruktur habe ich das angehängte Init-Skript fertig. Momentan arbeite ich an den Automatismen auf dem CI-Server mit Jenkins.
