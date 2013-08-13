@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# trigger jenkins builds for this repository 
+command="curl http://localhost:8080/git/notifyCommit?url=${PWD}"
+eval $command
+
