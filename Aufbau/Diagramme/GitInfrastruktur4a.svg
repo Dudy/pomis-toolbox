@@ -59,16 +59,9 @@
    <path fill="rgb(230,230,230)" stroke="rgb(128,128,128)" id="Drawing_2_0" stroke-linejoin="round" d="M 17697,18000 C 17163,18000 16709,17948 16247,17832 15785,17717 15452,17574 15186,17374 14919,17175 14797,16979 14797,16749 14797,16518 14919,16322 15186,16123 15452,15923 15785,15780 16247,15665 16709,15549 17163,15497 17697,15497 18231,15497 18685,15549 19147,15665 19609,15780 19942,15923 20208,16123 20475,16322 20597,16518 20597,16749 20597,16979 20475,17175 20208,17374 19942,17574 19609,17717 19147,17832 18685,17948 18231,18000 17697,18000 L 17697,18000 Z"/>
   </g>
   <g id="Drawing_3">
-   <path fill="rgb(51,51,51)" stroke="rgb(51,51,51)" stroke-linejoin="round" d="M 4100,3400 L 2000,3400 2000,2000 6200,2000 6200,3400 4100,3400 Z"/>
    <path fill="rgb(204,204,204)" stroke="rgb(128,128,128)" stroke-linejoin="round" d="M 4000,3300 L 1900,3300 1900,1900 6100,1900 6100,3300 4000,3300 Z"/>
-   <g fill="rgb(51,51,51)" stroke="none" font-family="Arial embedded" font-size="635" font-style="normal" font-weight="400">
-    <text x="3167" y="2916">G</text>
-    <text x="3662" y="2916">i</text>
-    <text x="3802" y="2916">t</text>
-    <text x="3980" y="2916">h</text>
-    <text x="4331" y="2916">u</text>
-    <text x="4683" y="2916">b</text>
-    <text fill="rgb(0,0,0)" stroke="none" x="3067" y="2816">G</text>
+   <g fill="rgb(0,0,0)" stroke="none" font-family="Arial embedded" font-size="635" font-style="normal" font-weight="400">
+    <text x="3067" y="2816">G</text>
     <text x="3562" y="2816">i</text>
     <text x="3702" y="2816">t</text>
     <text x="3880" y="2816">h</text>
@@ -80,19 +73,9 @@
    <path fill="rgb(230,230,230)" stroke="rgb(128,128,128)" id="Drawing_4_0" stroke-linejoin="round" d="M 4100,5800 C 3566,5800 3112,5752 2650,5646 2188,5540 1855,5408 1589,5225 1322,5042 1200,4862 1200,4650 1200,4438 1322,4258 1589,4075 1855,3892 2188,3760 2650,3654 3112,3548 3566,3500 4100,3500 4634,3500 5088,3548 5550,3654 6012,3760 6345,3892 6611,4075 6878,4258 7000,4438 7000,4650 7000,4862 6878,5042 6611,5225 6345,5408 6012,5540 5550,5646 5088,5752 4634,5800 4100,5800 L 4100,5800 Z"/>
   </g>
   <g id="Drawing_5">
-   <path fill="rgb(51,51,51)" stroke="rgb(51,51,51)" stroke-linejoin="round" d="M 12199,3399 L 10099,3399 10099,1999 14299,1999 14299,3399 12199,3399 Z"/>
    <path fill="rgb(204,204,204)" stroke="rgb(128,128,128)" stroke-linejoin="round" d="M 12099,3299 L 9999,3299 9999,1899 14199,1899 14199,3299 12099,3299 Z"/>
-   <g fill="rgb(51,51,51)" stroke="none" font-family="Arial embedded" font-size="635" font-style="normal" font-weight="400">
-    <text x="10842" y="2915">C</text>
-    <text x="11299" y="2915">I</text>
-    <text x="11477" y="2915">-</text>
-    <text x="11689" y="2915">S</text>
-    <text x="12112" y="2915">e</text>
-    <text x="12463" y="2915">r</text>
-    <text x="12675" y="2915">v</text>
-    <text x="12993" y="2915">e</text>
-    <text x="13344" y="2915">r</text>
-    <text fill="rgb(0,0,0)" stroke="none" x="10742" y="2815">C</text>
+   <g fill="rgb(0,0,0)" stroke="none" font-family="Arial embedded" font-size="635" font-style="normal" font-weight="400">
+    <text x="10742" y="2815">C</text>
     <text x="11199" y="2815">I</text>
     <text x="11377" y="2815">-</text>
     <text x="11589" y="2815">S</text>
@@ -107,20 +90,9 @@
    <path fill="rgb(230,230,230)" stroke="rgb(128,128,128)" id="Drawing_6_0" stroke-linejoin="round" d="M 12198,19898 C 11664,19898 11210,19850 10748,19744 10286,19638 9953,19506 9687,19323 9420,19140 9298,18960 9298,18748 9298,18536 9420,18356 9687,18173 9953,17990 10286,17858 10748,17752 11210,17646 11664,17598 12198,17598 12732,17598 13186,17646 13648,17752 14110,17858 14443,17990 14709,18173 14976,18356 15098,18536 15098,18748 15098,18960 14976,19140 14709,19323 14443,19506 14110,19638 13648,19744 13186,19850 12732,19898 12198,19898 L 12198,19898 Z"/>
   </g>
   <g id="Drawing_7">
-   <path fill="rgb(51,51,51)" stroke="rgb(51,51,51)" stroke-linejoin="round" d="M 25498,3399 L 23398,3399 23398,1999 27598,1999 27598,3399 25498,3399 Z"/>
    <path fill="rgb(204,204,204)" stroke="rgb(128,128,128)" stroke-linejoin="round" d="M 25398,3299 L 23298,3299 23298,1899 27498,1899 27498,3299 25398,3299 Z"/>
-   <g fill="rgb(51,51,51)" stroke="none" font-family="Arial embedded" font-size="635" font-style="normal" font-weight="400">
-    <text x="24061" y="2915">E</text>
-    <text x="24484" y="2915">n</text>
-    <text x="24836" y="2915">t</text>
-    <text x="25014" y="2915">w</text>
-    <text x="25458" y="2915">i</text>
-    <text x="25598" y="2915">c</text>
-    <text x="25915" y="2915">k</text>
-    <text x="26233" y="2915">l</text>
-    <text x="26372" y="2915">e</text>
-    <text x="26724" y="2915">r</text>
-    <text fill="rgb(0,0,0)" stroke="none" x="23961" y="2815">E</text>
+   <g fill="rgb(0,0,0)" stroke="none" font-family="Arial embedded" font-size="635" font-style="normal" font-weight="400">
+    <text x="23961" y="2815">E</text>
     <text x="24384" y="2815">n</text>
     <text x="24736" y="2815">t</text>
     <text x="24914" y="2815">w</text>
