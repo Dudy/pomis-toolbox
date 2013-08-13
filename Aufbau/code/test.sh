@@ -69,11 +69,23 @@ rootdir=$directory$project
 cd $rootdir
 
 #################################################################
+# create jenkins jobs
+#################################################################
+
+# TODO: ist bisher in createJenkinsJobs.sh ausgelagert
+
+#################################################################
 # initialize repositories
 #################################################################
 
 # hint: initialization of all repositories and branches here is done
 # the same way that the productive workflow later on is meant to be
+
+# work flow step 1 (developer)
+#     clone server alpha repository to local alpha repository
+#     add some files in working directory
+#     add new files in git
+#     commit and push changes back to server alpha repository
 
 # work takes place in a temporary directory
 temp_dir=/tmp/initGit_$timestamp
@@ -81,18 +93,40 @@ mkdir $temp_dir
 cd $temp_dir
 
 # use templates
-template_dir=/usr/lib/projectInit/templates
-template_name=buildApplication.sh.template
-new_name=${template_name::-9} # remove last nine characters (".template")
+template_dir=`dirname $0`/templates
 
 # clone alpha repository
 git clone $rootdir/alpha temp_alpha
 
 # add files to alpha repository
-cp $template_dir/$template_name $temp_dir/temp_alpha/$new_name
-chmod 777 $temp_dir/temp_alpha/$new_name
-# for later usage, if some content has to be changed
-#sed -i "s,###PLACEHOLDER###,$new_value,g" $temp_dir/temp_alpha/$new_name
+for f in *.sh
+do
+    echo "### copy $template_dir/$f to $temp_dir/temp_alpha/$f"
+    cp $template_dir/$f $temp_dir/temp_alpha/$f
+    chmod 777 $temp_dir/temp_alpha/$f
+done
+
+# add to repository
+cd $temp_dir/temp_alpha
+git add .
+git commit -m 'added test scripts'
+git push origin master
+
+# the following steps are all done by and on the CI-Server, no further
+# action required here (I just mention it here for clarity)
+# work flow step 2 (CI-Server)
+#     git hook on alpha:master detecs change
+#     merge changes to omega:master
+#     try to build the application
+#     if unsuccessful revert changes on omega and alpha repository,
+#         send mail to developer and exit
+#     if successful push changes to beta:unittests
+# work flow step 3 (CI-Server)
+#     git hook on beta:unittests detecs change
+#     run unit tests
+#     if unsuccessful revert changes on omega and alpha repository,
+#         send mail to developer and exit
+#     if successful push changes to beta:unittests
 
 #################################################################
 # end of file

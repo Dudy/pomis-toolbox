@@ -49,7 +49,7 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
       <hudson.tasks.Shell>
-          <command>buildApplication.sh</command>
+          <command>###COMMAND###</command>
       </hudson.tasks.Shell>
   </builders>
   <publishers/>

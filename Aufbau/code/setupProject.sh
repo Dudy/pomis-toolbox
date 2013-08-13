@@ -6,27 +6,28 @@
 
 function usageAndExit() {
     # goes to logfile
-	echo "### usage: setupProject [-d <directory>] -u <username> -p <password> -n <name>"
-	echo "###        directory:  [optional] the directory to create the new project in, defaults to current directory"
-	echo "###        username:   the username on Github"
-	echo "###        password:   the password on Github"
-	echo "###        project: the name of the project to create"
-	
-	#  restore stdout from fd #6, where it had been saved, and stderr from fd #7
-	exec 1<&6 6<&-
-	exec 2<&7 7<&-
-	
-	# goes to command line
-	echo " usage: setupProject [-d <directory>] -u <username> -p <password> -n <name>"
-	echo "        directory:  [optional] the directory to create the new project in, defaults to current directory"
-	echo "        username:   the username on Github"
-	echo "        password:   the password on Github"
-	echo "        project: the name of the project to create"
-	
-	if [ $# -ne 1 ] ; then
-		$1=1
-	fi
-	exit $1
+    
+    echo "### usage: setupProject [-d <directory>] -u <username> -p <password> -n <name>"
+    echo "###        directory:  [optional] the directory to create the new project in, defaults to current directory"
+    echo "###        username:   the username on Github"
+    echo "###        password:   the password on Github"
+    echo "###        project: the name of the project to create"
+    
+    #  restore stdout from fd #6, where it had been saved, and stderr from fd #7
+    exec 1<&6 6<&-
+    exec 2<&7 7<&-
+    
+    # goes to command line
+    echo " usage: setupProject [-d <directory>] -u <username> -p <password> -n <name>"
+    echo "        directory:  [optional] the directory to create the new project in, defaults to current directory"
+    echo "        username:   the username on Github"
+    echo "        password:   the password on Github"
+    echo "        project: the name of the project to create"
+    
+    if [ $# -ne 1 ] ; then
+        $1=1
+    fi
+    exit $1
 }
 
 #################################################################
@@ -59,18 +60,18 @@ directory=""
 OPTIND=1         # reset in case getopts has been used previously in the shell.
 
 while getopts "d:n:p:u:h" opt; do
-	case "$opt" in
-	d)	directory=$OPTARG
-		;;
-	n)  project=$OPTARG
-		;;
-	p)  password=$OPTARG
-		;;
-	u)  username=$OPTARG
-		;;
-	h)  usageAndExit 1
-		;;
-	esac
+    case "$opt" in
+        d)  directory=$OPTARG
+            ;;
+        n)  project=$OPTARG
+            ;;
+        p)  password=$OPTARG
+            ;;
+        u)  username=$OPTARG
+            ;;
+        h)  usageAndExit 1
+            ;;
+    esac
 done
 
 shift $((OPTIND-1))
@@ -79,12 +80,12 @@ shift $((OPTIND-1))
 
 if [[ -z $directory ]]; then
     directory=${PWD}
-	
-	# add trailing slash if there is no
-	case $directory in
-		*/) ;;
-		*) directory=$directory/;;
-	esac
+    
+    # add trailing slash if there is no
+    case $directory in
+        */) ;;
+        *) directory=$directory/;;
+    esac
 fi
 
 if [[ -z $password ]]; then
@@ -187,6 +188,12 @@ echo "### creation of omega repository finished"
 cd $rootdir
 
 #################################################################
+# create jenkins jobs
+#################################################################
+
+# TODO: ist bisher in createJenkinsJobs.sh ausgelagert
+
+#################################################################
 # initialize repositories
 #################################################################
 
@@ -200,7 +207,8 @@ cd $temp_dir
 
 # use templates
 template_dir=/usr/lib/projectInit/templates
-template_name=buildApplication.sh.template
+#template_dir=`dirname $0`/templates
+template_name=buildTest.sh.template
 new_name=${template_name::-9} # remove last nine characters (".template")
 
 # clone alpha repository
@@ -211,6 +219,8 @@ cp $template_dir/$template_name $temp_dir/temp_alpha/$new_name
 chmod 777 $temp_dir/temp_alpha/$new_name
 # for later usage, if some content has to be changed
 #sed -i "s,###PLACEHOLDER###,$new_value,g" $temp_dir/temp_alpha/$new_name
+
+# TODO: push to origin
 
 #################################################################
 # restore stdout and stderr and exit
